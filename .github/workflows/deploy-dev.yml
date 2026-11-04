@@ -1,7 +1,7 @@
 name: Deploy Databricks Bundle to DEV
 
 on:
-  workflow dispatch:
+  workflow_dispatch:
     inputs:
       branch:
         description: "Feature branch to deploy"
