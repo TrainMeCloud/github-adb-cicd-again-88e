@@ -1,0 +1,19 @@
+bundle:
+  name: github-adb-cicd-again-88e
+
+sync:
+  include:
+    - customer_transformation.ipynb
+
+targets:
+
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405616049421576.16.azuredatabricks.net
+
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-7405608537971533.13.azuredatabricks.net
