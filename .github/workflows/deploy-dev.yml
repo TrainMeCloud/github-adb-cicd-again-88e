@@ -1,1 +1,50 @@
 
+name: Deploy Databricks Bundle to DEV
+
+on:
+  workflow dispatch:
+    inputs:
+      branch:
+        description: "Feature branch to deploy"
+        required: true
+        default: "feature/customer-transformation"
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dev:
+    name: Deploy to DEV Databricks
+    runs-on: ubuntu-latest
+
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST_DEV }}
+      DATABRICKS_AUTH_TYPE: azure-cli
+      AZURE_CORE_OUTPUT: none
+
+    steps:
+      - name: Checkout selected feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Login to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify Databricks authentication
+        run: databricks current-user me
+
+      - name: Validate Databricks bundle
+        run: databricks bundle validate -t dev
+
+      - name: Deploy bundle to DEV
+        run: databricks bundle deploy -t dev
